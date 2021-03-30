@@ -1,9 +1,11 @@
+"""Use nba's api to build datasets"""
 
 import time
 import requests
 import pandas as pd
 
 class API:
+    """Get jsons from nba api"""
     # Headers needed to pass filter
     __HEADERS = {
         'Accept': 'application/json, text/plain, */*',
@@ -19,10 +21,12 @@ class API:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:87.0) Gecko/20100101 Firefox/87.0',
         })
 
-    def __get_json(self, url, headers={}):
+    def __get_json(self, url, headers=None):
+        """Return a json from a get request"""
+
         print('GET...', end='')
         time.sleep(1.5) ## Sleep before request to not flood api
-        res = self.req.get(url, headers=headers)
+        res = self.req.get(url, headers=headers if headers else {})
         print(res.status_code)
         # print(res.json())
         return res.json()
@@ -30,6 +34,8 @@ class API:
     def get_cumulative_team_stats(
         self, game_ids, team_id, season, season_type='Regular Season', league_id='00'
     ):
+        """Call endpoint to get cumulative team stats"""
+
         game_ids = '|'.join(game_ids)
         return self.__get_json(
             'https://stats.nba.com/stats/cumestatsteam?'+
@@ -41,6 +47,8 @@ class API:
     def get_cumulative_player_stats(
         self, game_ids, player_id, season, season_type='Regular Season', league_id='00'
     ):
+        """Call endpoint to get cumulative player stats"""
+
         game_ids = '|'.join(game_ids)
         return self.__get_json(
             'https://stats.nba.com/stats/cumestatsplayer?'+
@@ -50,6 +58,8 @@ class API:
         )
 
 def main():
+    """Main script"""
+
     # Open games dataset
     games_df = pd.read_csv('../datasets/games.csv')
     print(games_df.columns)
