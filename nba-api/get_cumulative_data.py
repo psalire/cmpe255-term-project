@@ -13,7 +13,7 @@ DATASETS_DIR = '../datasets/'
 class DatasetBuilder:
     """
         Keeps track of games visited per team to use with the nba api
-        REQUIRED: cumulative_games_stats.csv must be empty except for the required headers:
+        REQUIRED: cumulative_games_stats.csv must have the required headers:
                   DATE,SEASONTYPE,HOME,CITY,NICKNAME,TEAM_ID,W,L,W_HOME,
                   L_HOME,W_ROAD,L_ROAD,TEAM_TURNOVERS,
                   TEAM_REBOUNDS,GP,GS,ACTUAL_MINUTES,
