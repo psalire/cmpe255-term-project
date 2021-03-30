@@ -14,7 +14,7 @@ class DatasetBuilder:
     """
         Keeps track of games visited per team to use with the nba api
         REQUIRED: cumulative_games_stats.csv must be empty except for the required headers:
-                  DATE,GAMETYPE,HOME,CITY,NICKNAME,TEAM_ID,W,L,W_HOME,
+                  DATE,SEASONTYPE,HOME,CITY,NICKNAME,TEAM_ID,W,L,W_HOME,
                   L_HOME,W_ROAD,L_ROAD,TEAM_TURNOVERS,
                   TEAM_REBOUNDS,GP,GS,ACTUAL_MINUTES,
                   ACTUAL_SECONDS,FG,FGA,FG_PCT,FG3,FG3A,
@@ -54,11 +54,11 @@ class DatasetBuilder:
         team_id=str(team_id)
         season=str(season)
 
-        if season_type==1:
+        if season_type=='1':
             season_type_str='Pre Season'
-        elif season_type==2:
+        elif season_type=='2':
             season_type_str='Regular Season'
-        elif season_type==4:
+        elif season_type=='4':
             season_type_str='Playoffs'
         else:
             print(f'Unexpected season_type {season_type}. Exiting...')
@@ -84,15 +84,21 @@ class DatasetBuilder:
             print(json_res)
             sys.exit(1)
         stats_vals = json_res['resultSets'][1]['rowSet'][0]
-        assert len(self.stats_df.columns)-2==len(stats_vals)
+
+        assert len(self.stats_df.columns)-3==len(stats_vals)
         stats_dict = dict(zip(
-            self.stats_df.columns[2:], # Skip DATE and HOME
+            self.stats_df.columns[3:], # Skip DATE, SEASONTYPE, HOME
             stats_vals
         ))
 
         # Update dataframe
         self.stats_df = self.stats_df.append(
-            {'DATE': date, 'HOME': at_home, **stats_dict},
+            {
+                'DATE': date,
+                'SEASONTYPE': season_type,
+                'HOME': at_home,
+                **stats_dict
+            },
             ignore_index=True,
         )
 
@@ -134,10 +140,10 @@ def main():
     # return
 
     if start_index>0 and \
-      (dataset_builder.stats_df.iloc[len(dataset_builder.stats_df)-2]['TEAM_ID']
+      ((dataset_builder.stats_df.iloc[len(dataset_builder.stats_df)-2]['TEAM_ID']
       != games_df.iloc[start_index-1]['HOME_TEAM_ID']) or \
       (dataset_builder.stats_df.iloc[len(dataset_builder.stats_df)-1]['TEAM_ID']
-      != games_df.iloc[start_index-1]['VISITOR_TEAM_ID']):
+      != games_df.iloc[start_index-1]['VISITOR_TEAM_ID'])):
         print('Failed continuation check. Exiting...')
         sys.exit(1)
 
@@ -161,7 +167,7 @@ def main():
                 row['GAME_DATE_EST'],
                 at_home,
                 team_id,
-                row['GAME_ID'][0],
+                str(row['GAME_ID'])[0],
                 row['SEASON'],
             )
             at_home=False # Second game is visitor
