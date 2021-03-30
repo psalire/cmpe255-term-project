@@ -78,8 +78,6 @@ class DatasetBuilder:
         with open(self.dataset_dir+'cumulative_dict.json', 'w') as json_file:
             json.dump(self.visited_game_ids, json_file)
 
-START_INDEX = 300 # Parameter, start at index if continuing after crash
-
 def main():
     """Main script"""
 
@@ -99,18 +97,24 @@ def main():
 
     dataset_builder = DatasetBuilder()
 
-    # print(games_df.iloc[START_INDEX-1:START_INDEX+1])
+    if len(dataset_builder.stats_df) > 0:
+        # Start at index if continuing after crash
+        start_index = (len(dataset_builder.stats_df)+1)//2
+    else:
+        start_index = 0
+
+    # print(games_df.iloc[start_index-1:start_index+1])
     # return
 
-    if START_INDEX>0 and \
+    if start_index>0 and \
       (dataset_builder.stats_df.iloc[len(dataset_builder.stats_df)-2]['TEAM_ID']
-      != games_df.iloc[START_INDEX-1]['HOME_TEAM_ID']) or \
+      != games_df.iloc[start_index-1]['HOME_TEAM_ID']) or \
       (dataset_builder.stats_df.iloc[len(dataset_builder.stats_df)-1]['TEAM_ID']
-      != games_df.iloc[START_INDEX-1]['VISITOR_TEAM_ID']):
+      != games_df.iloc[start_index-1]['VISITOR_TEAM_ID']):
         print('Failed continuation check. Exiting...')
         sys.exit(1)
 
-    games_df = games_df[START_INDEX:]
+    games_df = games_df[start_index:]
 
     requests = 0
     for _, row in games_df.iterrows():

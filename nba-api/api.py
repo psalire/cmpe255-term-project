@@ -39,8 +39,10 @@ class API:
                 backoff *= 2
                 if backoff > 256:
                     backoff = 256
+                # New session
+                self.req = requests.Session()
                 self.req.headers.update({
-                    'Cookie': None,
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:87.0) Gecko/20100101 Firefox/87.0',
                 })
                 print(f'ConnectTimeout error. Wait {backoff} and try again...')
         # print(res.status_code)
