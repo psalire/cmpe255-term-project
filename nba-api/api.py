@@ -37,8 +37,11 @@ class API:
                 break
             except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
                 backoff *= 2
-                if backoff > 128:
-                    backoff = 128
+                if backoff > 256:
+                    backoff = 256
+                self.req.headers.update({
+                    'Cookie': None,
+                })
                 print(f'ConnectTimeout error. Wait {backoff} and try again...')
         # print(res.status_code)
         return res.json()
