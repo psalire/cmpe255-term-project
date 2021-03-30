@@ -97,25 +97,25 @@ class DatasetBuilder:
 
                     print('Retrying with previous game removed...')
                     # Try remove previous value
-                    visited_copy = \
-                        self.visited_game_ids[str(team_id)][str(season)][str(season_type)].copy()
-                    visited_copy.pop(-2)
+                    popped_val = \
+                        self.visited_game_ids[str(team_id)][str(season)][str(season_type)].pop(-2)
                     json_res = self._get_team_stats(team_id, season_type, season)
                     # if successful
                     if 'resultSets' in json_res:
                         print('Success!')
-                        self.visited_game_ids[str(team_id)][str(season)][str(season_type)].pop(-2)
                         break
-                    if 'Message' not in json_res or \
-                        ('Message' in json_res and json_res['Message']!='An error has occurred.'):
+                    if 'Message' not in json_res or json_res['Message']!='An error has occurred.':
                         print('Unexpected error:')
                         print(json_res)
                         print('Exiting...')
                         sys.exit(1)
 
-                    # Remove the current bad game
                     print('Fail, popping current game and adding empty row...')
+                    # Remove the current bad game and restore previously popped game
                     self.visited_game_ids[str(team_id)][str(season)][str(season_type)].pop()
+                    self.visited_game_ids[str(team_id)][str(season)][str(season_type)].append(
+                        popped_val
+                    )
                     # Update dataframe with empty row
                     self.stats_df = self.stats_df.append(
                         {
