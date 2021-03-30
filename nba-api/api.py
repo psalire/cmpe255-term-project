@@ -2,7 +2,6 @@
 
 import time
 import requests
-import pandas as pd
 # from pprint import PrettyPrinter
 
 class API:
