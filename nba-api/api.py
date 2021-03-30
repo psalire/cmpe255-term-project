@@ -26,7 +26,7 @@ class API:
         """Return a json from a get request"""
 
         print('GET... ')
-        time.sleep(1.5) ## Sleep before request to not flood api
+        time.sleep(1) ## Sleep before request to not flood api
         res = self.req.get(url, headers=headers if headers else {})
         print(res.status_code)
         # print(res.json())
