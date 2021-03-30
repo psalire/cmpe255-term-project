@@ -1,6 +1,7 @@
 
 import time
 import requests
+import pandas as pd
 
 class API:
     # Headers needed to pass filter
@@ -49,9 +50,12 @@ class API:
         )
 
 def main():
+    # Open games dataset
+    games_df = pd.read_csv('../datasets/games.csv')
+    print(games_df.columns)
     nba_api = API()
-    nba_api.get_cumulative_team_stats(['0012000034'],'1610612759','2020')
-    nba_api.get_cumulative_player_stats(['0012000034'],'1610612759','2020')
+    # nba_api.get_cumulative_team_stats(['0012000034'],'1610612759','2020')
+    # nba_api.get_cumulative_player_stats(['0012000034'],'1610612759','2020')
 
 
 if __name__=='__main__':
