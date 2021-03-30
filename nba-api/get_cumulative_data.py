@@ -24,7 +24,7 @@ class API:
     def __get_json(self, url, headers=None):
         """Return a json from a get request"""
 
-        print('GET...', end='')
+        print('GET... ')
         time.sleep(1.5) ## Sleep before request to not flood api
         res = self.req.get(url, headers=headers if headers else {})
         print(res.status_code)
@@ -36,7 +36,7 @@ class API:
     ):
         """Call endpoint to get cumulative team stats"""
 
-        game_ids = '|'.join(game_ids)
+        game_ids = '|'.join([s.zfill(10) for s in game_ids])
         return self.__get_json(
             'https://stats.nba.com/stats/cumestatsteam?'+
             f'GameIDs={game_ids}&LeagueID={league_id}&Season={season}&'+
@@ -49,7 +49,7 @@ class API:
     ):
         """Call endpoint to get cumulative player stats"""
 
-        game_ids = '|'.join(game_ids)
+        game_ids = '|'.join([s.zfill(10) for s in game_ids])
         return self.__get_json(
             'https://stats.nba.com/stats/cumestatsplayer?'+
             f'GameIDs={game_ids}&LeagueID={league_id}&PlayerID={player_id}&'+
@@ -62,9 +62,9 @@ def main():
 
     # Open games dataset
     games_df = pd.read_csv('../datasets/games.csv')
-    print(games_df.columns)
+    # print(games_df.columns)
     nba_api = API()
-    # nba_api.get_cumulative_team_stats(['0012000034'],'1610612759','2020')
+    nba_api.get_cumulative_team_stats(['0012000034'],'1610612759','2020')
     # nba_api.get_cumulative_player_stats(['0012000034'],'1610612759','2020')
 
 
