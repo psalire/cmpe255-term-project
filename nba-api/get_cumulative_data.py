@@ -28,11 +28,15 @@ class DatasetBuilder:
         self.stats_df = Local.get_cumulative_games_stats_dataframe(DATASETS_DIR)
         self.api = NBA_API()
         self.dataset_dir = dataset_dir
+        self.max_games_allowed = 72
         with open(self.dataset_dir+'cumulative_dict.json') as json_file:
             self.visited_game_ids = json.load(json_file)
 
     def add_game_id(self, game_id, team_id, season):
-        """Appends current game_id to visited_game_ids"""
+        """
+            Appends current game_id to visited_game_ids
+            returns bool, whether at limit of max_games_allowed
+        """
 
         game_id=str(game_id)
         team_id=str(team_id)
@@ -48,6 +52,9 @@ class DatasetBuilder:
         if season_type not in self.visited_game_ids[team_id][season]:
             self.visited_game_ids[team_id][season][season_type] = []
         self.visited_game_ids[team_id][season][season_type].append(game_id)
+
+        return len(self.visited_game_ids[team_id][season][season_type]) > \
+                self.max_games_allowed
 
     def _get_team_stats(self, team_id, season_type, season):
         """Calls API to get cumulative stats using visited_game_ids"""
@@ -215,19 +222,38 @@ def main():
         at_home=True # First game is at home
         for team_id in [row['HOME_TEAM_ID'], row['VISITOR_TEAM_ID']]:
             # Add entry
-            dataset_builder.add_game_id(
+            at_max = dataset_builder.add_game_id(
                 row['GAME_ID'],
                 team_id,
                 row['SEASON'],
             )
             # Update dataframe, and save csv every 10 requests
-            dataset_builder.update_dataframe(
-                row['GAME_DATE_EST'],
-                at_home,
-                team_id,
-                str(row['GAME_ID'])[0],
-                row['SEASON'],
-            )
+            ## API only allows adding 72 games at a time
+            ## so if at limit, don't make request
+            if not at_max:
+                dataset_builder.update_dataframe(
+                    row['GAME_DATE_EST'],
+                    at_home,
+                    team_id,
+                    str(row['GAME_ID'])[0],
+                    row['SEASON'],
+                )
+            else:
+                print('[INFO] At max, skipping and adding empty row...')
+                # Update dataframe with empty row
+                dataset_builder.stats_df = dataset_builder.stats_df.append(
+                    {
+                        **dict(zip(
+                            dataset_builder.stats_df.columns[3:],
+                            [None]*len(dataset_builder.stats_df.columns[3:])
+                        )),
+                        'DATE': str(row['GAME_DATE_EST']),
+                        'SEASONTYPE': str(row['GAME_ID'])[0],
+                        'HOME': at_home,
+                        'TEAM_ID': str(team_id)
+                    },
+                    ignore_index=True,
+                )
             at_home=False # Second game is visitor
         if requests%10 == 0:
             dataset_builder.save_dataframe_to_csv('cumulative_games_stats.csv')
