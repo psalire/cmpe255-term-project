@@ -19,14 +19,16 @@ class API:
         })
 
     def __get_json(self, url, headers={}):
-        print('GET...')
-        time.sleep(1)
+        print('GET...', end='')
+        time.sleep(1.5) ## Sleep before request to not flood api
         res = self.req.get(url, headers=headers)
         print(res.status_code)
-        print(res.json())
+        # print(res.json())
         return res.json()
 
-    def get_cumulative_team_stats(self, game_id, team_id, season, season_type='Regular Season', league_id='00'):
+    def get_cumulative_team_stats(
+        self, game_id, team_id, season, season_type='Regular Season', league_id='00'
+    ):
         return self.__get_json(
             'https://stats.nba.com/stats/cumestatsteam?'+
             f'GameIDs={game_id}&LeagueID={league_id}&Season={season}&'+
@@ -34,7 +36,9 @@ class API:
             headers=self.__HEADERS,
         )
 
-    def get_cumulative_player_stats(self, game_id, player_id, season, season_type='Regular Season', league_id='00'):
+    def get_cumulative_player_stats(
+        self, game_id, player_id, season, season_type='Regular Season', league_id='00'
+    ):
         return self.__get_json(
             'https://stats.nba.com/stats/cumestatsplayer?'+
             f'GameIDs={game_id}&LeagueID={league_id}&PlayerID={player_id}&'+
