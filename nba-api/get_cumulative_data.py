@@ -92,10 +92,29 @@ class DatasetBuilder:
             if 'Message' in json_res and json_res['Message']=='An error has occurred.':
                 print('***Received 500 error***')
 
-                if backoff>=16:
+                if backoff>=8:
                     print('Retries failed.')
-                    # Remove the bad value
-                    print('Popping bad value and adding empty row......')
+
+                    print('Retrying with previous game removed...')
+                    # Try remove previous value
+                    visited_copy = \
+                        self.visited_game_ids[str(team_id)][str(season)][str(season_type)].copy()
+                    visited_copy.pop(-2)
+                    json_res = self._get_team_stats(team_id, season_type, season)
+                    # if successful
+                    if 'resultSets' in json_res:
+                        print('Success!')
+                        self.visited_game_ids[str(team_id)][str(season)][str(season_type)].pop(-2)
+                        break
+                    if 'Message' not in json_res or \
+                        ('Message' in json_res and json_res['Message']!='An error has occurred.'):
+                        print('Unexpected error:')
+                        print(json_res)
+                        print('Exiting...')
+                        sys.exit(1)
+
+                    # Remove the current bad game
+                    print('Fail, popping current game and adding empty row...')
                     self.visited_game_ids[str(team_id)][str(season)][str(season_type)].pop()
                     # Update dataframe with empty row
                     self.stats_df = self.stats_df.append(
@@ -121,6 +140,7 @@ class DatasetBuilder:
                 print(json_res)
                 print('Exiting...')
                 sys.exit(1)
+
         stats_vals = json_res['resultSets'][1]['rowSet'][0]
 
         assert len(self.stats_df.columns)-3==len(stats_vals)
