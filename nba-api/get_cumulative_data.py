@@ -2,6 +2,7 @@
 
 import sys
 import json
+import time
 from api import API as NBA_API
 # import pandas as pd
 sys.path.append('../')
@@ -79,29 +80,42 @@ class DatasetBuilder:
             f'[INFO] Fetching JSON for {date}, teamID-{team_id}, '+
             f'gameType-{season_type} season-{season}:'
         )
-        json_res = self._get_team_stats(team_id, season_type, season)
-        if 'resultSets' not in json_res:
+
+        backoff=2
+        while True:
+            json_res = self._get_team_stats(team_id, season_type, season)
+
+            if 'resultSets' in json_res:
+                break
+
             # If api failed due to internal error
             if 'Message' in json_res and json_res['Message']=='An error has occurred.':
                 print('***Received 500 error***')
-                # Remove the bad value
-                print('Popping bad value...')
-                self.visited_game_ids[str(team_id)][str(season)][str(season_type)].pop()
-                # Update dataframe with empty row
-                self.stats_df = self.stats_df.append(
-                    {
-                        **dict(zip(
-                            self.stats_df.columns[3:],
-                            [None]*len(self.stats_df.columns[3:])
-                        )),
-                        'DATE': date,
-                        'SEASONTYPE': str(season_type),
-                        'HOME': at_home,
-                        'TEAM_ID': str(team_id)
-                    },
-                    ignore_index=True,
-                )
-                return
+
+                if backoff>=128:
+                    print('Retries failed.')
+                    # Remove the bad value
+                    print('Popping bad value and adding empty row......')
+                    self.visited_game_ids[str(team_id)][str(season)][str(season_type)].pop()
+                    # Update dataframe with empty row
+                    self.stats_df = self.stats_df.append(
+                        {
+                            **dict(zip(
+                                self.stats_df.columns[3:],
+                                [None]*len(self.stats_df.columns[3:])
+                            )),
+                            'DATE': date,
+                            'SEASONTYPE': str(season_type),
+                            'HOME': at_home,
+                            'TEAM_ID': str(team_id)
+                        },
+                        ignore_index=True,
+                    )
+                    return
+
+                print(f'Trying again in {backoff} seconds...')
+                time.sleep(backoff)
+                backoff*=2
             else:
                 print('Unexpected error:')
                 print(json_res)
