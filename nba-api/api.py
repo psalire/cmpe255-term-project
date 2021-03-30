@@ -35,7 +35,7 @@ class API:
                     timeout=5,
                 )
                 break
-            except requests.exceptions.ConnectTimeout:
+            except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
                 backoff *= 2
                 if backoff > 128:
                     backoff = 128
