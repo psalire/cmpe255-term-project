@@ -260,9 +260,9 @@ def main():
                 )
             at_home=False # Second game is visitor
         if requests%10 == 0:
-            dataset_builder.save_dataframe_to_csv('cumulative_games_stats.csv')
+            dataset_builder.save_dataframe_to_csv('2017_cumulative_games_stats.csv')
 
-    dataset_builder.save_dataframe_to_csv('cumulative_games_stats.csv')
+    dataset_builder.save_dataframe_to_csv('2017_cumulative_games_stats.csv')
 
 if __name__=='__main__':
     main()
