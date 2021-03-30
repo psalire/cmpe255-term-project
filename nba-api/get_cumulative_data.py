@@ -27,8 +27,8 @@ class DatasetBuilder:
         self.stats_df = Local.get_cumulative_games_stats_dataframe(DATASETS_DIR)
         self.api = NBA_API()
         self.dataset_dir = dataset_dir
-        with open(self.dataset_dir+'cumulative_dict.json') as f:
-            self.visited_game_ids = json.load(f)
+        with open(self.dataset_dir+'cumulative_dict.json') as json_file:
+            self.visited_game_ids = json.load(json_file)
 
     def add_game_id(self, game_id, team_id, season):
         """Appends current game_id to visited_game_ids"""
@@ -61,8 +61,8 @@ class DatasetBuilder:
 
         # Fetch json
         print(f'[INFO] Fetching JSON for {date}, teamID-{team_id}, season-{season}:')
-        json = self._get_team_stats(team_id, season)
-        stats_vals = json['resultSets'][1]['rowSet'][0]
+        json_res = self._get_team_stats(team_id, season)
+        stats_vals = json_res['resultSets'][1]['rowSet'][0]
         stats_dict = dict(zip(self.stats_df.columns[1:],stats_vals))
 
         # Update dataframe
@@ -75,8 +75,8 @@ class DatasetBuilder:
         """Save dataframe to csv at self.dataset_dir/filename, and json dict"""
 
         self.stats_df.to_csv(self.dataset_dir+filename)
-        with open(self.dataset_dir+'cumulative_dict.json', 'w') as f:
-            json.dump(self.visited_game_ids, f)
+        with open(self.dataset_dir+'cumulative_dict.json', 'w') as json_file:
+            json.dump(self.visited_game_ids, json_file)
 
 def main():
     """Main script"""
