@@ -16,6 +16,11 @@ def get_games_and_winners_dataframe(path=DATASETS_DIR):
 
     return games_df, winners_df
 
+def get_cumulative_games_stats_dataframe(path=DATASETS_DIR):
+    """cumulative_games_stats.csv"""
+
+    return pd.read_csv(path+'cumulative_games_stats.csv')
+
 def get_games_details_dataframe(path=DATASETS_DIR):
     """games_details.csv"""
 
