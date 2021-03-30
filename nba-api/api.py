@@ -2,7 +2,6 @@
 
 import time
 import requests
-# from pprint import PrettyPrinter
 
 class API:
     """Get jsons from nba api"""

@@ -1,6 +1,7 @@
 """Use nba's api to build datasets"""
 
 import sys
+import json
 from api import API as NBA_API
 # import pandas as pd
 sys.path.append('../')
@@ -24,9 +25,10 @@ class DatasetBuilder:
 
     def __init__(self, dataset_dir=DATASETS_DIR):
         self.stats_df = Local.get_cumulative_games_stats_dataframe(DATASETS_DIR)
-        self.visited_game_ids = {} # {team_id: {season:{game_ids}}}
         self.api = NBA_API()
         self.dataset_dir = dataset_dir
+        with open(self.dataset_dir+'cumulative_dict.json') as f:
+            self.visited_game_ids = json.load(f)
 
     def add_game_id(self, game_id, team_id, season):
         """Appends current game_id to visited_game_ids"""
@@ -70,8 +72,11 @@ class DatasetBuilder:
         )
 
     def save_dataframe_to_csv(self, filename):
-        """Save dataframe to csv at self.dataset_dir/filename"""
+        """Save dataframe to csv at self.dataset_dir/filename, and json dict"""
+
         self.stats_df.to_csv(self.dataset_dir+filename)
+        with open(self.dataset_dir+'cumulative_dict.json', 'w') as f:
+            json.dump(self.visited_game_ids, f)
 
 def main():
     """Main script"""
@@ -86,7 +91,9 @@ def main():
         'SEASON',
     ]]
     # Endpoint only supports 2017 season and after
-    games_df = games_df[games_df['SEASON'] >= 2017]
+    games_df = games_df[
+        (games_df['SEASON'] >= 2017)
+    ]
 
     dataset_builder = DatasetBuilder()
 
@@ -108,8 +115,8 @@ def main():
                 team_id,
                 row['SEASON'],
             )
-            if requests%10 == 0:
-                dataset_builder.save_dataframe_to_csv('cumulative_games_stats.csv')
+        if requests%10 == 0:
+            dataset_builder.save_dataframe_to_csv('cumulative_games_stats.csv')
 
     dataset_builder.save_dataframe_to_csv('cumulative_games_stats.csv')
 
