@@ -27,29 +27,31 @@ class API:
         return res.json()
 
     def get_cumulative_team_stats(
-        self, game_id, team_id, season, season_type='Regular Season', league_id='00'
+        self, game_ids, team_id, season, season_type='Regular Season', league_id='00'
     ):
+        game_ids = '|'.join(game_ids)
         return self.__get_json(
             'https://stats.nba.com/stats/cumestatsteam?'+
-            f'GameIDs={game_id}&LeagueID={league_id}&Season={season}&'+
+            f'GameIDs={game_ids}&LeagueID={league_id}&Season={season}&'+
             f'SeasonType={season_type}&TeamID={team_id}',
             headers=self.__HEADERS,
         )
 
     def get_cumulative_player_stats(
-        self, game_id, player_id, season, season_type='Regular Season', league_id='00'
+        self, game_ids, player_id, season, season_type='Regular Season', league_id='00'
     ):
+        game_ids = '|'.join(game_ids)
         return self.__get_json(
             'https://stats.nba.com/stats/cumestatsplayer?'+
-            f'GameIDs={game_id}&LeagueID={league_id}&PlayerID={player_id}&'+
+            f'GameIDs={game_ids}&LeagueID={league_id}&PlayerID={player_id}&'+
             f'Season={season}&SeasonType={season_type}',
             headers=self.__HEADERS,
         )
 
 def main():
     nba_api = API()
-    nba_api.get_cumulative_team_stats('0012000034','1610612759','2020')
-    nba_api.get_cumulative_player_stats('0012000034','1610612759','2020')
+    nba_api.get_cumulative_team_stats(['0012000034'],'1610612759','2020')
+    nba_api.get_cumulative_player_stats(['0012000034'],'1610612759','2020')
 
 
 if __name__=='__main__':
