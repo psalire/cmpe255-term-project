@@ -92,7 +92,7 @@ class DatasetBuilder:
             if 'Message' in json_res and json_res['Message']=='An error has occurred.':
                 print('***Received 500 error***')
 
-                if backoff>=128:
+                if backoff>=32:
                     print('Retries failed.')
                     # Remove the bad value
                     print('Popping bad value and adding empty row......')
