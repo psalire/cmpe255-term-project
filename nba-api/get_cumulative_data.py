@@ -1,4 +1,4 @@
-"""Use nba's api to build datasets"""
+"""Use nba's api to build datasets (only 2017 onwards)"""
 
 import sys
 import json
