@@ -74,9 +74,11 @@ class DatasetBuilder:
     def save_dataframe_to_csv(self, filename):
         """Save dataframe to csv at self.dataset_dir/filename, and json dict"""
 
-        self.stats_df.to_csv(self.dataset_dir+filename)
+        self.stats_df.to_csv(self.dataset_dir+filename, index=False)
         with open(self.dataset_dir+'cumulative_dict.json', 'w') as json_file:
             json.dump(self.visited_game_ids, json_file)
+
+START_INDEX = 580 # Parameter, start at index if continuing after crash
 
 def main():
     """Main script"""
@@ -93,7 +95,10 @@ def main():
     # Endpoint only supports 2017 season and after
     games_df = games_df[
         (games_df['SEASON'] >= 2017)
-    ]
+    ].iloc[START_INDEX:]
+
+    # print(games_df.iloc[580:581])
+    # return
 
     dataset_builder = DatasetBuilder()
 
