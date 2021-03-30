@@ -69,8 +69,8 @@ class DatasetBuilder:
         elif season_type=='4':
             season_type_str='Playoffs'
         else:
-            print(f'Unexpected season_type {season_type}. Exiting...')
-            sys.exit(1)
+            print(f'Unexpected season_type {season_type}')
+            return None
         # print(self.visited_game_ids[team_id][season][season_type])
         return self.api.get_cumulative_team_stats(
             self.visited_game_ids[team_id][season][season_type],
@@ -91,6 +91,10 @@ class DatasetBuilder:
         backoff=2
         while True:
             json_res = self._get_team_stats(team_id, season_type, season)
+
+            if json_res is None:
+                # Invalid season_type
+                return
 
             if 'resultSets' in json_res:
                 break
