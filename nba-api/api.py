@@ -29,6 +29,7 @@ class API:
             time.sleep(backoff) ## Sleep before request to not flood api
             try:
                 print('GET... ')
+                self.req.headers.update({'Cookie':None})
                 res = self.req.get(
                     url,
                     headers=headers if headers else {},

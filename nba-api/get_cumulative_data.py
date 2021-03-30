@@ -14,7 +14,7 @@ class DatasetBuilder:
     """
         Keeps track of games visited per team to use with the nba api
         REQUIRED: cumulative_games_stats.csv must be empty except for the required headers:
-                  DATE,CITY,NICKNAME,TEAM_ID,W,L,W_HOME,
+                  DATE,GAMETYPE,HOME,CITY,NICKNAME,TEAM_ID,W,L,W_HOME,
                   L_HOME,W_ROAD,L_ROAD,TEAM_TURNOVERS,
                   TEAM_REBOUNDS,GP,GS,ACTUAL_MINUTES,
                   ACTUAL_SECONDS,FG,FGA,FG_PCT,FG3,FG3A,
@@ -37,37 +37,62 @@ class DatasetBuilder:
         team_id=str(team_id)
         season=str(season)
 
+        season_type=game_id[0] # 1-pre,2-reg,4-post
+
         # Add current game_id to set of visited game_ids
         if team_id not in self.visited_game_ids:
             self.visited_game_ids[team_id] = {}
         if season not in self.visited_game_ids[team_id]:
-            self.visited_game_ids[team_id][season] = []
-        self.visited_game_ids[team_id][season].append(game_id)
+            self.visited_game_ids[team_id][season] = {}
+        if season_type not in self.visited_game_ids[team_id][season]:
+            self.visited_game_ids[team_id][season][season_type] = []
+        self.visited_game_ids[team_id][season][season_type].append(game_id)
 
-    def _get_team_stats(self, team_id, season):
+    def _get_team_stats(self, team_id, season_type, season):
         """Calls API to get cumulative stats using visited_game_ids"""
 
         team_id=str(team_id)
         season=str(season)
 
+        if season_type==1:
+            season_type_str='Pre Season'
+        elif season_type==2:
+            season_type_str='Regular Season'
+        elif season_type==4:
+            season_type_str='Playoffs'
+        else:
+            print(f'Unexpected season_type {season_type}. Exiting...')
+            sys.exit(1)
+
         return self.api.get_cumulative_team_stats(
-            self.visited_game_ids[team_id][season],
+            self.visited_game_ids[team_id][season][season_type],
             team_id,
-            season
+            season,
+            season_type=season_type_str
         )
 
-    def update_dataframe(self, date, team_id, season):
+    def update_dataframe(self, date, at_home, team_id, season_type, season):
         """Updates dataframe with json"""
 
         # Fetch json
-        print(f'[INFO] Fetching JSON for {date}, teamID-{team_id}, season-{season}:')
-        json_res = self._get_team_stats(team_id, season)
+        print(
+            f'[INFO] Fetching JSON for {date}, teamID-{team_id}, '+
+            f'gameType-{season_type} season-{season}:'
+        )
+        json_res = self._get_team_stats(team_id, season_type, season)
+        if 'resultSets' not in json_res:
+            print(json_res)
+            sys.exit(1)
         stats_vals = json_res['resultSets'][1]['rowSet'][0]
-        stats_dict = dict(zip(self.stats_df.columns[1:],stats_vals))
+        assert len(self.stats_df.columns)-2==len(stats_vals)
+        stats_dict = dict(zip(
+            self.stats_df.columns[2:], # Skip DATE and HOME
+            stats_vals
+        ))
 
         # Update dataframe
         self.stats_df = self.stats_df.append(
-            {'DATE': date, **stats_dict},
+            {'DATE': date, 'HOME': at_home, **stats_dict},
             ignore_index=True,
         )
 
@@ -103,6 +128,8 @@ def main():
     else:
         start_index = 0
 
+    print(f'Starting at {start_index}...')
+
     # print(games_df.iloc[start_index-1:start_index+1])
     # return
 
@@ -121,6 +148,7 @@ def main():
         requests+=1
         print(f'REQUEST #{requests}')
         # Update dataframe for both home & visiting team
+        at_home=True # First game is at home
         for team_id in [row['HOME_TEAM_ID'], row['VISITOR_TEAM_ID']]:
             # Add entry
             dataset_builder.add_game_id(
@@ -131,9 +159,12 @@ def main():
             # Update dataframe, and save csv every 10 requests
             dataset_builder.update_dataframe(
                 row['GAME_DATE_EST'],
+                at_home,
                 team_id,
+                row['GAME_ID'][0],
                 row['SEASON'],
             )
+            at_home=False # Second game is visitor
         if requests%10 == 0:
             dataset_builder.save_dataframe_to_csv('cumulative_games_stats.csv')
 
