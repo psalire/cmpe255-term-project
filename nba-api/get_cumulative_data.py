@@ -41,8 +41,8 @@ class DatasetBuilder:
         if team_id not in self.visited_game_ids:
             self.visited_game_ids[team_id] = {}
         if season not in self.visited_game_ids[team_id]:
-            self.visited_game_ids[team_id][season] = set()
-        self.visited_game_ids[team_id][season].add(game_id)
+            self.visited_game_ids[team_id][season] = []
+        self.visited_game_ids[team_id][season].append(game_id)
 
     def _get_team_stats(self, team_id, season):
         """Calls API to get cumulative stats using visited_game_ids"""
