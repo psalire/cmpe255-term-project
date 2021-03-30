@@ -44,7 +44,7 @@ class DatasetBuilder:
             season
         )
 
-    def update_dataframe(self, json, save_csv=True):
+    def update_dataframe(self, date, json, save_to_csv='cumulative_games_stats.csv'):
         """Updates dataframe with json"""
 
 
@@ -53,16 +53,41 @@ def main():
 
     # Open games dataset
     games_df, _ = Local.get_games_and_winners_dataframe(DATASETS_DIR)
-    games_df = games_df[['GAME_DATE_EST','HOME_TEAM_ID','VISITOR_TEAM_ID']]
-    print(games_df.iloc[[0]])
+    games_df = games_df[[
+        'GAME_DATE_EST',
+        'GAME_ID',
+        'HOME_TEAM_ID',
+        'VISITOR_TEAM_ID',
+        'SEASON',
+    ]]
 
     dataset_builder = DatasetBuilder()
-    dataset_builder.add_game_id('0022000677','1610612737','2020')
-    dataset_builder.add_game_id('0022000660','1610612737','2020')
-    dataset_builder.add_game_id('0022000640','1610612737','2020')
-    print(dataset_builder.visited_game_ids)
+    # dataset_builder.add_game_id('0022000677','1610612737','2020')
 
-    PrettyPrinter().pprint(dataset_builder.get_team_stats('1610612737','2020'))
+    i=0
+    for _, row in games_df.iterrows():
+        dataset_builder.add_game_id(
+            row['GAME_ID'],
+            row['HOME_TEAM_ID'],
+            row['SEASON'],
+        )
+        dataset_builder.add_game_id(
+            row['GAME_ID'],
+            row['VISITOR_TEAM_ID'],
+            row['SEASON'],
+        )
+        if i==50:
+            break
+        i+=1
+    PrettyPrinter().pprint(dataset_builder.visited_game_ids)
+
+    # dataset_builder = DatasetBuilder()
+    # dataset_builder.add_game_id('0022000677','1610612737','2020')
+    # dataset_builder.add_game_id('0022000660','1610612737','2020')
+    # dataset_builder.add_game_id('0022000640','1610612737','2020')
+    # print(dataset_builder.visited_game_ids)
+    #
+    # PrettyPrinter().pprint(dataset_builder.get_team_stats('1610612737','2020'))
 
 if __name__=='__main__':
     main()
