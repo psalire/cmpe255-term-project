@@ -78,7 +78,7 @@ class DatasetBuilder:
         with open(self.dataset_dir+'cumulative_dict.json', 'w') as json_file:
             json.dump(self.visited_game_ids, json_file)
 
-START_INDEX = 580 # Parameter, start at index if continuing after crash
+START_INDEX = 300 # Parameter, start at index if continuing after crash
 
 def main():
     """Main script"""
@@ -95,12 +95,22 @@ def main():
     # Endpoint only supports 2017 season and after
     games_df = games_df[
         (games_df['SEASON'] >= 2017)
-    ].iloc[START_INDEX:]
-
-    # print(games_df.iloc[580:581])
-    # return
+    ]
 
     dataset_builder = DatasetBuilder()
+
+    # print(games_df.iloc[START_INDEX-1:START_INDEX+1])
+    # return
+
+    if START_INDEX>0 and \
+      (dataset_builder.stats_df.iloc[len(dataset_builder.stats_df)-2]['TEAM_ID']
+      != games_df.iloc[START_INDEX-1]['HOME_TEAM_ID']) or \
+      (dataset_builder.stats_df.iloc[len(dataset_builder.stats_df)-1]['TEAM_ID']
+      != games_df.iloc[START_INDEX-1]['VISITOR_TEAM_ID']):
+        print('Failed continuation check. Exiting...')
+        sys.exit(1)
+
+    games_df = games_df[START_INDEX:]
 
     requests = 0
     for _, row in games_df.iterrows():
