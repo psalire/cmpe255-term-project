@@ -3,6 +3,7 @@
 import time
 import requests
 import pandas as pd
+# from pprint import PrettyPrinter
 
 class API:
     """Get jsons from nba api"""
@@ -62,9 +63,12 @@ def main():
 
     # Open games dataset
     games_df = pd.read_csv('../datasets/games.csv')
+    output_df = pd.read_csv('../datasets/cumulative_games_stats.csv')
     # print(games_df.columns)
+    # pp = PrettyPrinter()
     nba_api = API()
-    nba_api.get_cumulative_team_stats(['0012000034'],'1610612759','2020')
+    # nba_api.get_cumulative_team_stats(['0012000034'],'1610612759','2020')
+    # pp.pprint(x['resultSets'][1])
     # nba_api.get_cumulative_player_stats(['0012000034'],'1610612759','2020')
 
 
