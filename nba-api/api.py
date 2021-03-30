@@ -24,11 +24,23 @@ class API:
     def __get_json(self, url, headers=None):
         """Return a json from a get request"""
 
-        print('GET... ')
-        time.sleep(1) ## Sleep before request to not flood api
-        res = self.req.get(url, headers=headers if headers else {})
-        print(res.status_code)
-        # print(res.json())
+        backoff = 1
+        while True:
+            time.sleep(backoff) ## Sleep before request to not flood api
+            try:
+                print('GET... ')
+                res = self.req.get(
+                    url,
+                    headers=headers if headers else {},
+                    timeout=5,
+                )
+                break
+            except requests.exceptions.ConnectTimeout:
+                backoff *= 2
+                if backoff > 128:
+                    backoff = 128
+                print(f'ConnectTimeout error. Wait {backoff} and try again...')
+        # print(res.status_code)
         return res.json()
 
     def get_cumulative_team_stats(
