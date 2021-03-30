@@ -6,6 +6,7 @@ import requests
 
 class API:
     """Get jsons from nba api"""
+
     # Headers needed to pass filter
     __HEADERS = {
         'Accept': 'application/json, text/plain, */*',
