@@ -3,8 +3,7 @@
 import sys
 import pandas as pd
 import numpy as np
-sys.path.append('../')
-from datasets import data as Local ## Local module to get dataframes
+import data as Local ## Local module to get dataframes
 
 DATASETS_DIR = '../datasets/'
 
