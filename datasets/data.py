@@ -18,6 +18,11 @@ def get_games_and_winners_dataframe(path=DATASETS_DIR):
 
     return games_df, winners_df
 
+def get_cumulative_games_stats_dataframe(path=DATASETS_DIR):
+    """2017_cumulative_games_stats.csv"""
+
+    return pd.read_csv(path+'cumulative_games_stats.csv')
+
 def get_games_details_dataframe(path=DATASETS_DIR):
     """games_details.csv"""
 
@@ -54,6 +59,7 @@ def get_all_dataset_dataframes(path=DATASETS_DIR):
 
     return (
         *get_games_and_winners_dataframe(path),
+        get_cumulative_games_stats_dataframe(path),
         get_games_details_dataframe(path),
         get_teams_dataframe(path),
         get_players_dataframe(path),
