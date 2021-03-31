@@ -11,6 +11,8 @@ def get_games_and_winners_dataframe(path=DATASETS_DIR):
     games_df = pd.read_csv(path+'games.csv')
     games_df.sort_values(by='GAME_DATE_EST', inplace=True)
     winners_df = games_df['HOME_TEAM_WINS']
+    del games_df['TEAM_ID_home'] # Redundant with HOME_TEAM_ID
+    del games_df['TEAM_ID_away'] # Redundant with VISITOR_TEAM_ID
     del games_df['HOME_TEAM_WINS']
     del games_df['GAME_STATUS_TEXT'] # Always 'Final'
 
