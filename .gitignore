@@ -1,4 +1,5 @@
 .ipynb_checkpoints/
 **/__pycache__/
+**/*.bkup
 nba-api/throwaway.py
 datasets/cumulative_dict.json
