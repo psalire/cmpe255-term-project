@@ -42,12 +42,12 @@ class DatasetBuilder:
                 self.cumulative_stats[team_id][row['SEASON']] = {
                     'TEAM_ID': str(team_id),
                     'SEASON': row['SEASON'],
-                    'AT_HOME': home_team,
                     'GAMES_PLAYED': 0,
                 }
             self.cumulative_stats[team_id][row['SEASON']]['GAME_ID']=str(row['GAME_ID'])
             self.cumulative_stats[team_id][row['SEASON']]['SEASON_TYPE']=str(row['GAME_ID'])[0]
             self.cumulative_stats[team_id][row['SEASON']]['DATE']=row['GAME_DATE_EST']
+            self.cumulative_stats[team_id][row['SEASON']]['AT_HOME']=home_team
 
             tag = 'home' if home_team else 'away'
             none_val = False
@@ -94,7 +94,11 @@ class DatasetBuilder:
         """Add row to dataframe with values of current dict val"""
 
         self.stats_df = self.stats_df.append(
-            self.cumulative_stats[team_id][season],
+            {
+                k:self.cumulative_stats[team_id][season][k] \
+                for k in self.cumulative_stats[team_id][season] \
+                if k not in {'sum_FG_PCT_total','sum_FT_PCT_total','sum_FG3_PCT_total'}
+            },
             ignore_index=True,
         )
 
