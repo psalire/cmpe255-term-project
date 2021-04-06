@@ -1,8 +1,6 @@
 """Build cumulative dataset from games.csv"""
 
-import sys
 import pandas as pd
-import numpy as np
 import data as Local ## Local module to get dataframes
 
 DATASETS_DIR = '../datasets/'
