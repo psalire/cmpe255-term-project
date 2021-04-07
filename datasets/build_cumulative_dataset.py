@@ -10,6 +10,7 @@ class DatasetBuilder:
 
     def __init__(self, datasets_dir=DATASETS_DIR, out_filename='out'):
         self.games_df, _ = Local.get_games_and_winners_dataframe(DATASETS_DIR)
+        self.ranking_df = Local.get_ranking_dataframe(DATASETS_DIR)
         self.cumulative_stats = {}
         # Don't add averages, only countable values
         self.avg_cols = {
@@ -46,6 +47,10 @@ class DatasetBuilder:
             self.cumulative_stats[team_id][row['SEASON']]['SEASON_TYPE']=str(row['GAME_ID'])[0]
             self.cumulative_stats[team_id][row['SEASON']]['DATE']=row['GAME_DATE_EST']
             self.cumulative_stats[team_id][row['SEASON']]['AT_HOME']=home_team
+            self.cumulative_stats[team_id][row['SEASON']]['W_PCT']= self.ranking_df[
+                (self.ranking_df['TEAM_ID']==team_id) &
+                (self.ranking_df['STANDINGSDATE']==row['GAME_DATE_EST'])
+            ]['W_PCT'].iloc[0]
 
             tag = 'home' if home_team else 'away'
             none_val = False

@@ -21,12 +21,28 @@ def get_games_and_winners_dataframe(path=DATASETS_DIR):
 def get_cumulative_games_stats_dataframe(path=DATASETS_DIR):
     """combined_cumulative_games_stats.csv"""
 
-    return pd.read_csv(path+'combined_cumulative_games_stats.csv')
+    stats_df = pd.read_csv(path+'combined_cumulative_games_stats.csv')
+    del stats_df['PTS_total_home']
+    del stats_df['PTS_total_away']
+    del stats_df['REB_total_home']
+    del stats_df['REB_total_away']
+    del stats_df['AST_total_home']
+    del stats_df['AST_total_away']
+
+    return stats_df
 
 def get_home_visitor_games_stats_dataframe(path=DATASETS_DIR):
     """cumulative_games_stats_dataframe.csv"""
 
-    return pd.read_csv(path+'cumulative_games_stats.csv')
+    stats_df = pd.read_csv(path+'cumulative_games_stats.csv')
+    del stats_df['PTS_total_home']
+    del stats_df['PTS_total_away']
+    del stats_df['REB_total_home']
+    del stats_df['REB_total_away']
+    del stats_df['AST_total_home']
+    del stats_df['AST_total_away']
+
+    return stats_df
 
 def get_games_details_dataframe(path=DATASETS_DIR):
     """games_details.csv"""
