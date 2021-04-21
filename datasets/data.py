@@ -5,18 +5,30 @@ import pandas as pd
 # DATASETS_DIR = 'datasets/'
 DATASETS_DIR = './'
 
-def get_games_and_winners_dataframe(path=DATASETS_DIR):
+def get_games_and_targets_dataframe(path=DATASETS_DIR):
     """games.csv"""
 
     games_df = pd.read_csv(path+'games.csv')
     games_df.sort_values(by='GAME_DATE_EST', inplace=True)
+
     winners_df = games_df['HOME_TEAM_WINS']
+    greater_fgp = games_df['HOME_HIGHER_FG_PCT']
+    greater_fg3 = games_df['HOME_HIGHER_FG3_PCT']
+    greater_ft = games_df['HOME_HIGHER_FT_PCT']
+    greater_ast = games_df['HOME_HIGHER_AST']
+    greater_reb = games_df['HOME_HIGHER_REB']
+
     del games_df['TEAM_ID_home'] # Redundant with HOME_TEAM_ID
     del games_df['TEAM_ID_away'] # Redundant with VISITOR_TEAM_ID
     del games_df['HOME_TEAM_WINS']
+    del games_df['HOME_HIGHER_FG_PCT']
+    del games_df['HOME_HIGHER_FG3_PCT']
+    del games_df['HOME_HIGHER_FT_PCT']
+    del games_df['HOME_HIGHER_AST']
+    del games_df['HOME_HIGHER_REB']
     del games_df['GAME_STATUS_TEXT'] # Always 'Final'
 
-    return games_df, winners_df
+    return games_df, winners_df, greater_fgp, greater_fg3, greater_ft, greater_ast, greater_reb
 
 def get_cumulative_games_stats_dataframe(path=DATASETS_DIR):
     """combined_cumulative_games_stats.csv"""
@@ -79,7 +91,7 @@ def get_all_dataset_dataframes(path=DATASETS_DIR):
     """Return dataset dataframes"""
 
     return (
-        *get_games_and_winners_dataframe(path),
+        *get_games_and_targets_dataframe(path),
         get_cumulative_games_stats_dataframe(path),
         get_games_details_dataframe(path),
         get_teams_dataframe(path),
