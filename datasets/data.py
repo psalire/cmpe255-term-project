@@ -30,6 +30,21 @@ def get_games_and_targets_dataframe(path=DATASETS_DIR):
 
     return games_df, winners_df, greater_fgp, greater_fg3, greater_ft, greater_ast, greater_reb
 
+def get_team_v_team_stats_dataframe(path=DATASETS_DIR):
+    '''cumulative_team_v_team_game_stats.csv'''
+
+    games_df = pd.read_csv(path+'cumulative_team_v_team_game_stats.csv')
+    games_df.sort_values(by='DATE', inplace=True)
+
+    del games_df['PTS_total_home']
+    del games_df['PTS_total_away']
+    del games_df['REB_total_home']
+    del games_df['REB_total_away']
+    del games_df['AST_total_home']
+    del games_df['AST_total_away']
+
+    return games_df
+
 def get_cumulative_games_stats_dataframe(path=DATASETS_DIR):
     """combined_cumulative_games_stats.csv"""
 
