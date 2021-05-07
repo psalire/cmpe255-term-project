@@ -58,6 +58,12 @@ def get_cumulative_games_stats_dataframe(path=DATASETS_DIR):
 
     return stats_df
 
+def get_cumulative_player_stats_dataframe(path=DATASETS_DIR):
+    """cumulative_player_stats.csv"""
+    stats_df = pd.read_csv(path+'cumulative_player_stats.csv')
+
+    return stats_df
+
 def get_home_visitor_games_stats_dataframe(path=DATASETS_DIR):
     """cumulative_games_stats_dataframe.csv"""
 
