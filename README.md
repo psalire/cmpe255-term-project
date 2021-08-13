@@ -1,4 +1,10 @@
-# CMPE 255 Term Project - NBA Predictor
+# NBA Game Winner and Stats Predictor
+
+By combining SMOTEENN with XGBoost, we were able gain +14% macro average accuracy gain on predicting the winners of NBA games and binary statistic results (e.g. which team has higher rebounds, assists, etc.).
+
+For example, the home team wins 59% of the time, so pure guessing that the home team wins results in 59% accuracy. Our trained model predicts the home team winner correctly with 74% accuracy -- a +15% improvement. See the powerpoint for more details
+
+This was a final project for CMPE 255 @ SJSU.
 
 ## Files
 
